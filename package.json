@@ -1,0 +1,33 @@
+{
+  "name": "create-package",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "bin": {
+    "create-package": "src/cli.ts"
+  },
+  "files": [
+    "src",
+    "templates"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:all": "bun run src/testing/runner.ts",
+    "test:variants": "bun run src/testing/runner.ts",
+    "test:quick": "bun run src/testing/runner.ts --test",
+    "test:cli": "bun run src/cli.ts"
+  },
+  "dependencies": {
+    "prompts": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/prompts": "latest",
+    "tsup": "latest",
+    "typescript": "latest",
+    "vitest": "latest"
+  }
+}

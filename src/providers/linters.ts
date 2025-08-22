@@ -18,6 +18,11 @@ export class LinterProvider implements Provider<LinterFormatter> {
   "$schema": "https://biomejs.dev/schemas/2.2.0/schema.json",
   "linter": { "enabled": true },
   "formatter": { "enabled": true },
+  "files": {
+    "includes": [
+      "src/**/*.ts"
+    ]
+  },
   "javascript": { "formatter": { "quoteStyle": "single", "trailingCommas": "all" } }
 }`,
       },

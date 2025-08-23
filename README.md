@@ -5,7 +5,7 @@ Instantly create a fully configured npm package with GitHub Actions, testing, an
 ## Usage
 
 ```bash
-npx create-npm-pkg
+npx @create/npm-pkg
 ```
 
 ## CLI Output

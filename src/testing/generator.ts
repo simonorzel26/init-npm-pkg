@@ -154,19 +154,26 @@ export class TestGenerator {
     fs.writeFileSync(path.join(srcDir, 'utils.ts'), sourceTemplates.utils);
     fs.writeFileSync(path.join(srcDir, 'index.ts'), sourceTemplates.index);
 
-    let testTemplate;
-    let testExtension;
-    switch (config.tester.name) {
-      case 'bun':
-        testTemplate = sourceTemplates.bun;
-        testExtension = 'ts';
-        break;
-      default:
-        testTemplate = sourceTemplates.vitest;
-        testExtension = 'ts';
-        break;
+    // Only create test files if tester is not 'none'
+    if (config.tester.name !== 'none') {
+      let testTemplate;
+      let testExtension;
+      switch (config.tester.name) {
+        case 'buntest':
+          testTemplate = sourceTemplates.bun;
+          testExtension = 'ts';
+          break;
+        case 'vitest':
+          testTemplate = sourceTemplates.vitest;
+          testExtension = 'ts';
+          break;
+        default:
+          testTemplate = sourceTemplates.vitest;
+          testExtension = 'ts';
+          break;
+      }
+      fs.writeFileSync(path.join(srcDir, `utils.test.${testExtension}`), testTemplate);
     }
-    fs.writeFileSync(path.join(srcDir, `utils.test.${testExtension}`), testTemplate);
   }
 
   async installDependencies(variant: TestVariant, projectDir: string): Promise<boolean> {

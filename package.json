@@ -1,8 +1,17 @@
 {
   "name": "create-pkg",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A modern TypeScript package generator with multiple build tools, linters, and test frameworks",
-  "keywords": ["typescript", "package", "generator", "scaffold", "create", "bun", "npm", "vitest"],
+  "keywords": [
+    "typescript",
+    "package",
+    "generator",
+    "scaffold",
+    "create",
+    "bun",
+    "npm",
+    "vitest"
+  ],
   "author": "Simon Orzel",
   "license": "MIT",
   "repository": {

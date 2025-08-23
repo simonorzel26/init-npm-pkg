@@ -10,11 +10,11 @@ npx create-pkg
 
 ## CLI Output
 
-![CLI Setup](input.png)
+<img src="input.png" alt="CLI Setup" width="400" />
 
 ## Generated Structure
 
-![Project Structure](output.png)
+<img src="output.png" alt="Project Structure" width="300" />
 
 ## What You Get
 
@@ -34,17 +34,6 @@ npx create-pkg
 | Linter | Biome, ESLint + Prettier |
 | Testing | Vitest, Bun Test, None |
 | Git | Initialize repository (optional) |
-
-## Environment Variables
-
-Skip prompts with environment variables:
-
-```bash
-CREATE_PACKAGE_NAME=my-lib \
-CREATE_PACKAGE_PM=bun \
-CREATE_PACKAGE_FORMATTER=biome \
-npx create-pkg
-```
 
 ## License
 

@@ -16,11 +16,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/simonorzel26/create-pkg.git"
+    "url": "git+https://github.com/simonorzel26/npm-pkg.git"
   },
-  "homepage": "https://github.com/simonorzel26/create-pkg#readme",
+  "homepage": "https://github.com/simonorzel26/npm-pkg#readme",
   "bugs": {
-    "url": "https://github.com/simonorzel26/create-pkg/issues"
+    "url": "https://github.com/simonorzel26/npm-pkg/issues"
   },
   "private": false,
   "type": "module",

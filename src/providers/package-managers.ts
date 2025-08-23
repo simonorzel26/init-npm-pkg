@@ -19,10 +19,12 @@ export class PackageManagerProvider implements Provider<PackageManagerAndBuilder
         'bun-types': 'latest',
       },
       scripts: {
-        build: 'bun build ./src/index.ts --outdir ./dist --target node --format esm && tsc --declaration --emitDeclarationOnly --outDir dist src/index.ts src/utils.ts',
+        build: 'bun build ./src/index.ts --outdir ./dist --target node --format esm && bun --bun tsc --declaration --emitDeclarationOnly --outDir dist src/index.ts src/utils.ts',
         dev: 'bun build ./src/index.ts --outdir ./dist --target node --format esm --watch',
         clean: 'rm -rf dist',
-        typecheck: 'tsc --noEmit',
+        typecheck: 'bun --bun tsc --noEmit',
+        prepublishOnly: 'bun run ci',
+        ci: 'bun run build && bun run test && bun run lint',
       },
     },
     npm: {
@@ -46,6 +48,8 @@ export class PackageManagerProvider implements Provider<PackageManagerAndBuilder
         dev: 'tsup --watch',
         clean: 'rm -rf dist',
         typecheck: 'tsc --noEmit',
+        prepublishOnly: 'npm run ci',
+        ci: 'npm run build && npm run test && npm run lint',
       },
     },
   };

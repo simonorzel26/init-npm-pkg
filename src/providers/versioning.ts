@@ -13,8 +13,6 @@ export class VersioningProvider implements Provider<Versioning> {
         version: 'changeset version',
         release: 'changeset publish',
         'local-release': 'changeset version && changeset publish',
-        prepublishOnly: 'npm run ci',
-        ci: 'npm run build && npm run test && npm run lint',
       },
       config: `{
   "$schema": "https://unpkg.com/@changesets/config@2.3.1/schema.json",

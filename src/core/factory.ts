@@ -36,7 +36,7 @@ export class ProjectFactory {
     versioningProvider.get(versioningName);
   }
 
-  static generatePackageJson(config: ProjectConfig, projectName: string): Record<string, any> {
+  static generatePackageJson(config: ProjectConfig, projectName: string, githubUsername: string = "yourusername"): Record<string, any> {
     const allDevDependencies = {
       ...config.packageManagerAndBuilder.devDependencies,
       ...config.linterFormatter.devDependencies,
@@ -56,14 +56,14 @@ export class ProjectFactory {
       version: "1.0.0",
       description: "A TypeScript package",
       keywords: ["typescript", "package"],
-      homepage: `https://github.com/yourusername/${projectName}`,
+      homepage: `https://github.com/${githubUsername}/${projectName}`,
       bugs: {
-        url: `https://github.com/yourusername/${projectName}/issues`
+        url: `https://github.com/${githubUsername}/${projectName}/issues`
       },
       author: "",
       repository: {
         type: "git",
-        url: `git+https://github.com/yourusername/${projectName}.git`
+        url: `git+https://github.com/${githubUsername}/${projectName}.git`
       },
       files: ["dist"],
       type: "module",

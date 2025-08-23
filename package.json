@@ -1,29 +1,36 @@
 {
-  "name": "create-package",
+  "name": "create-pkg",
   "version": "0.1.0",
   "description": "A modern TypeScript package generator with multiple build tools, linters, and test frameworks",
   "keywords": ["typescript", "package", "generator", "scaffold", "create", "bun", "npm", "vitest"],
-  "author": "Your Name",
+  "author": "Simon Orzel",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/create-package.git"
+    "url": "git+https://github.com/simonorzel26/create-pkg.git"
   },
-  "homepage": "https://github.com/yourusername/create-package#readme",
+  "homepage": "https://github.com/simonorzel26/create-pkg#readme",
   "bugs": {
-    "url": "https://github.com/yourusername/create-package/issues"
+    "url": "https://github.com/simonorzel26/create-pkg/issues"
   },
   "private": false,
   "type": "module",
+  "main": "dist/cli.js",
   "bin": {
-    "create-package": "dist/cli.js"
+    "create-pkg": "dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/cli.js",
+      "default": "./dist/cli.js"
+    }
   },
   "files": [
     "dist",
     "templates"
   ],
   "scripts": {
-    "build": "bun build ./src/cli.ts --outdir ./dist --target node --format esm --declaration",
+    "build": "bun build ./src/cli.ts --outdir ./dist --target node --format esm",
     "dev": "bun build ./src/cli.ts --outdir ./dist --target node --format esm --watch",
     "test": "bun run vitest run",
     "test:watch": "bun run vitest",
@@ -31,13 +38,13 @@
     "test:variants": "bun run src/testing/runner.ts",
     "test:quick": "bun run src/testing/runner.ts --test",
     "test:cli": "bun run src/cli.ts",
-    "prepublishOnly": "bun run build",
-    "check": "bun --help"
+    "prepublishOnly": "bun run build"
   },
   "dependencies": {
     "prompts": "latest"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.6",
     "@types/node": "latest",
     "@types/prompts": "latest",
     "typescript": "latest",

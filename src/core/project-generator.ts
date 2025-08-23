@@ -1,5 +1,5 @@
-import fs from "node:fs";
-import path from "node:path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import { ProjectFactory } from "./factory.js";
 import { sourceTemplates } from "../templates/source.js";
 import { generateCI } from "../templates/ci.js";

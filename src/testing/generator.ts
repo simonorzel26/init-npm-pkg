@@ -121,7 +121,7 @@ export class TestGenerator {
     this.writeSourceFiles(projectDir, projectName, config);
   }
 
-  private writeConfigFiles(projectDir: string, config: any): void {
+    private writeConfigFiles(projectDir: string, config: any): void {
     Object.entries(config.linterFormatter.configFiles).forEach(([filename, content]) => {
       fs.writeFileSync(path.join(projectDir, filename), content as string);
     });
@@ -132,9 +132,9 @@ export class TestGenerator {
       });
     }
 
-      if (config.packageManagerAndBuilder.name === 'npm') {
-    fs.writeFileSync(path.join(projectDir, "tsup.config.ts"), sourceTemplates.tsupConfig);
-  }
+    if (config.packageManagerAndBuilder.name === 'npm') {
+      fs.writeFileSync(path.join(projectDir, "tsup.config.ts"), sourceTemplates.tsupConfig);
+    }
 
     if (config.versioning.name === 'changeset') {
       const changesetConfigPath = path.join(projectDir, '.changeset/config.json');
@@ -142,10 +142,27 @@ export class TestGenerator {
       fs.writeFileSync(changesetConfigPath, config.versioning.config);
     }
 
-    fs.writeFileSync(path.join(projectDir, 'tsconfig.json'), sourceTemplates.tsconfig);
+    // Generate TypeScript configuration based on package manager and tester
+    const tsconfig = this.generateTsConfig(config);
+    fs.writeFileSync(path.join(projectDir, 'tsconfig.json'), tsconfig);
+
     fs.writeFileSync(path.join(projectDir, '.gitignore'), sourceTemplates.gitignore);
     fs.writeFileSync(path.join(projectDir, 'README.md'), sourceTemplates.readme(config.packageManagerAndBuilder.name));
     fs.writeFileSync(path.join(projectDir, 'LICENSE'), sourceTemplates.license);
+  }
+
+  private generateTsConfig(config: any): string {
+    const baseConfig = JSON.parse(sourceTemplates.tsconfig);
+
+    // Add Bun types if using Bun package manager or Bun test
+    if (config.packageManagerAndBuilder.name === 'bun' || config.tester.name === 'buntest') {
+      if (!baseConfig.compilerOptions.types) {
+        baseConfig.compilerOptions.types = [];
+      }
+      baseConfig.compilerOptions.types.push('bun-types');
+    }
+
+    return JSON.stringify(baseConfig, null, 2);
   }
 
   private writeSourceFiles(projectDir: string, projectName: string, config: any): void {

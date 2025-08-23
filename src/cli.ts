@@ -133,10 +133,26 @@ function writeConfigFiles(projectDir: string, config: any): void {
     fs.writeFileSync(changesetConfigPath, config.versioning.config);
   }
 
-  fs.writeFileSync(path.join(projectDir, 'tsconfig.json'), sourceTemplates.tsconfig);
+  // Generate TypeScript configuration based on package manager and tester
+  const tsconfig = generateTsConfig(config);
+  fs.writeFileSync(path.join(projectDir, 'tsconfig.json'), tsconfig);
   fs.writeFileSync(path.join(projectDir, '.gitignore'), sourceTemplates.gitignore);
   fs.writeFileSync(path.join(projectDir, 'README.md'), sourceTemplates.readme(config.packageManagerAndBuilder.name));
   fs.writeFileSync(path.join(projectDir, 'LICENSE'), sourceTemplates.license);
+}
+
+function generateTsConfig(config: any): string {
+  const baseConfig = JSON.parse(sourceTemplates.tsconfig);
+
+  // Add Bun types if using Bun package manager or Bun test
+  if (config.packageManagerAndBuilder.name === 'bun' || config.tester.name === 'buntest') {
+    if (!baseConfig.compilerOptions.types) {
+      baseConfig.compilerOptions.types = [];
+    }
+    baseConfig.compilerOptions.types.push('bun-types');
+  }
+
+  return JSON.stringify(baseConfig, null, 2);
 }
 
 function writeSourceFiles(projectDir: string, projectName: string, config: any): void {
@@ -146,19 +162,26 @@ function writeSourceFiles(projectDir: string, projectName: string, config: any):
   fs.writeFileSync(path.join(srcDir, 'utils.ts'), sourceTemplates.utils);
   fs.writeFileSync(path.join(srcDir, 'index.ts'), sourceTemplates.index);
 
-  let testTemplate;
-  let testExtension;
-  switch (config.tester.name) {
-    case 'bun':
-      testTemplate = sourceTemplates.bun;
-      testExtension = 'ts';
-      break;
-    default:
-      testTemplate = sourceTemplates.vitest;
-      testExtension = 'ts';
-      break;
+  // Only create test files if tester is not 'none'
+  if (config.tester.name !== 'none') {
+    let testTemplate;
+    let testExtension;
+    switch (config.tester.name) {
+      case 'buntest':
+        testTemplate = sourceTemplates.bun;
+        testExtension = 'ts';
+        break;
+      case 'vitest':
+        testTemplate = sourceTemplates.vitest;
+        testExtension = 'ts';
+        break;
+      default:
+        testTemplate = sourceTemplates.vitest;
+        testExtension = 'ts';
+        break;
+    }
+    fs.writeFileSync(path.join(srcDir, `utils.test.${testExtension}`), testTemplate);
   }
-  fs.writeFileSync(path.join(srcDir, `utils.test.${testExtension}`), testTemplate);
 }
 
 main().catch((error) => {

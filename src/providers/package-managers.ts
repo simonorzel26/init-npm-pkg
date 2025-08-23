@@ -16,6 +16,7 @@ export class PackageManagerProvider implements Provider<PackageManagerAndBuilder
       runPrefix: 'bun run',
       devDependencies: {
         'typescript': 'latest',
+        'bun-types': 'latest',
       },
       scripts: {
         build: 'bun build ./src/index.ts --outdir ./dist --target node --format esm && tsc --declaration --emitDeclarationOnly --outDir dist src/index.ts src/utils.ts',

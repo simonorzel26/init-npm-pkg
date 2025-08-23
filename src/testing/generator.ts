@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import { execSync } from 'node:child_process';
 import { ProjectFactory } from '../core/factory.js';
 import { choices } from '../core/choices.js';
@@ -8,11 +9,11 @@ import { generateCI } from '../templates/ci.js';
 import type { TestVariant, TestResult } from '../core/types.js';
 
 export class TestGenerator {
-  private testDir: string;
   private variants: TestVariant[] = [];
+  private tempDirs: string[] = [];
 
-  constructor(testDir: string = './test-variants') {
-    this.testDir = testDir;
+  constructor() {
+    // No longer need a fixed test directory
   }
 
   generateAllVariants(): TestVariant[] {
@@ -69,16 +70,11 @@ export class TestGenerator {
     return this.variants;
   }
 
-  async createTestProject(variant: TestVariant): Promise<boolean> {
-    const projectDir = path.join(this.testDir, variant.name);
+  async createTestProject(variant: TestVariant): Promise<{ success: boolean; projectDir?: string }> {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), `create-package-test-${variant.name}-`));
+    this.tempDirs.push(tempDir);
 
     try {
-      if (fs.existsSync(projectDir)) {
-        fs.rmSync(projectDir, { recursive: true, force: true });
-      }
-
-      fs.mkdirSync(projectDir, { recursive: true });
-
       const config = ProjectFactory.createProject(
         variant.packageManagerAndBuilder,
         variant.linterFormatter,
@@ -86,11 +82,26 @@ export class TestGenerator {
         variant.versioning
       );
 
-      this.writeProjectFiles(projectDir, config, variant.name);
-      return true;
+      this.writeProjectFiles(tempDir, config, variant.name);
+      return { success: true, projectDir: tempDir };
     } catch (error) {
       console.error(`Failed to create test project for ${variant.name}:`, error);
-      return false;
+      this.cleanupTempDir(tempDir);
+      return { success: false };
+    }
+  }
+
+  private cleanupTempDir(dir: string): void {
+    try {
+      if (fs.existsSync(dir)) {
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
+      const index = this.tempDirs.indexOf(dir);
+      if (index > -1) {
+        this.tempDirs.splice(index, 1);
+      }
+    } catch (error) {
+      console.error(`Failed to cleanup temp directory ${dir}:`, error);
     }
   }
 
@@ -158,9 +169,7 @@ export class TestGenerator {
     fs.writeFileSync(path.join(srcDir, `utils.test.${testExtension}`), testTemplate);
   }
 
-  async installDependencies(variant: TestVariant): Promise<boolean> {
-    const projectDir = path.join(this.testDir, variant.name);
-
+  async installDependencies(variant: TestVariant, projectDir: string): Promise<boolean> {
     try {
       const installCmd = this.getInstallCommand(variant.packageManagerAndBuilder);
       execSync(installCmd, { cwd: projectDir, stdio: 'pipe' });
@@ -179,9 +188,7 @@ export class TestGenerator {
     }
   }
 
-  async buildProject(variant: TestVariant): Promise<boolean> {
-    const projectDir = path.join(this.testDir, variant.name);
-
+  async buildProject(variant: TestVariant, projectDir: string): Promise<boolean> {
     try {
       const buildCmd = this.getBuildCommand(variant.packageManagerAndBuilder);
       execSync(buildCmd, { cwd: projectDir, stdio: 'pipe' });
@@ -200,13 +207,11 @@ export class TestGenerator {
     }
   }
 
-  async runTests(variant: TestVariant): Promise<boolean> {
+  async runTests(variant: TestVariant, projectDir: string): Promise<boolean> {
     // Skip running tests if tester is "none"
     if (variant.tester === 'none') {
       return true;
     }
-
-    const projectDir = path.join(this.testDir, variant.name);
 
     try {
       const testCmd = this.getTestCommand(variant.packageManagerAndBuilder);
@@ -226,8 +231,7 @@ export class TestGenerator {
     }
   }
 
-  verifyExports(variant: TestVariant): boolean {
-    const projectDir = path.join(this.testDir, variant.name);
+  verifyExports(variant: TestVariant, projectDir: string): boolean {
     const distDir = path.join(projectDir, 'dist');
 
     try {
@@ -268,17 +272,13 @@ export class TestGenerator {
     }
   }
 
-  async testPackageAsNpmPackage(variant: TestVariant): Promise<boolean> {
-    const projectDir = path.join(this.testDir, variant.name);
+  async testPackageAsNpmPackage(variant: TestVariant, projectDir: string): Promise<boolean> {
 
     try {
-      const consumerDir = path.join(this.testDir, `${variant.name}-consumer`);
-      if (fs.existsSync(consumerDir)) {
-        fs.rmSync(consumerDir, { recursive: true, force: true });
-      }
-      fs.mkdirSync(consumerDir, { recursive: true });
+      const consumerDir = fs.mkdtempSync(path.join(os.tmpdir(), `create-package-consumer-${variant.name}-`));
+      this.tempDirs.push(consumerDir);
 
-      const testScript = `import { add, subtract, multiply, divide } from '../${variant.name}/dist/index.js';
+      const testScript = `import { add, subtract, multiply, divide } from '${projectDir}/dist/index.js';
 
 console.log('Testing package imports...');
 
@@ -310,8 +310,6 @@ console.log('✅ All tests passed! Package works correctly.');
         env: { ...process.env, NODE_OPTIONS: '--experimental-specifier-resolution=node' }
       });
 
-      fs.rmSync(consumerDir, { recursive: true, force: true });
-
       return true;
     } catch (error) {
       console.error(`Failed to test package as npm package for ${variant.name}:`, error);
@@ -319,8 +317,7 @@ console.log('✅ All tests passed! Package works correctly.');
     }
   }
 
-  async testScripts(variant: TestVariant): Promise<{ [key: string]: boolean }> {
-    const projectDir = path.join(this.testDir, variant.name);
+  async testScripts(variant: TestVariant, projectDir: string): Promise<{ [key: string]: boolean }> {
     const packageJsonPath = path.join(projectDir, 'package.json');
     const results: { [key: string]: boolean } = {};
 
@@ -455,30 +452,36 @@ console.log('✅ All tests passed! Package works correctly.');
 
   async runAllTests(): Promise<TestResult[]> {
     const results: TestResult[] = [];
+    const totalVariants = this.variants.length;
 
-    console.log(`Testing ${this.variants.length} variants...`);
+    console.log(`Testing ${totalVariants} variants...`);
 
-    for (const variant of this.variants) {
-      console.log(`\nTesting ${variant.name}...`);
+    for (let i = 0; i < this.variants.length; i++) {
+      const variant = this.variants[i];
+      const currentTest = i + 1;
+
+      console.log(`\n[${currentTest}/${totalVariants}] Testing ${variant.name}...`);
 
       const result: TestResult = { variant, success: false };
+      let projectDir: string | undefined;
 
       try {
         const created = await this.createTestProject(variant);
-        if (!created) {
+        if (!created.success) {
           result.error = 'Failed to create project';
           results.push(result);
           continue;
         }
+        projectDir = created.projectDir!;
 
-        const installed = await this.installDependencies(variant);
+        const installed = await this.installDependencies(variant, projectDir);
         if (!installed) {
           result.error = 'Failed to install dependencies';
           results.push(result);
           continue;
         }
 
-        const built = await this.buildProject(variant);
+        const built = await this.buildProject(variant, projectDir);
         result.buildSuccess = built;
         if (!built) {
           result.error = 'Failed to build project';
@@ -486,14 +489,14 @@ console.log('✅ All tests passed! Package works correctly.');
           continue;
         }
 
-        const tested = await this.runTests(variant);
+        const tested = await this.runTests(variant, projectDir);
         if (!tested) {
           result.error = 'Failed to run tests';
           results.push(result);
           continue;
         }
 
-        const exportsMatch = this.verifyExports(variant);
+        const exportsMatch = this.verifyExports(variant, projectDir);
         result.exportsMatch = exportsMatch;
         if (!exportsMatch) {
           result.error = 'Exports verification failed';
@@ -501,7 +504,7 @@ console.log('✅ All tests passed! Package works correctly.');
           continue;
         }
 
-        const npmPackageWorks = await this.testPackageAsNpmPackage(variant);
+        const npmPackageWorks = await this.testPackageAsNpmPackage(variant, projectDir);
         result.npmPackageWorks = npmPackageWorks;
         if (!npmPackageWorks) {
           result.error = 'NPM package import test failed';
@@ -509,7 +512,7 @@ console.log('✅ All tests passed! Package works correctly.');
           continue;
         }
 
-        const scriptResults = await this.testScripts(variant);
+        const scriptResults = await this.testScripts(variant, projectDir);
         result.scriptResults = scriptResults;
 
         const failedScripts = Object.entries(scriptResults).filter(([_, success]) => !success);
@@ -520,10 +523,14 @@ console.log('✅ All tests passed! Package works correctly.');
         }
 
         result.success = true;
-        console.log(`✅ ${variant.name} - All tests passed (including npm package test and scripts)`);
+        console.log(`✅ [${currentTest}/${totalVariants}] ${variant.name} - All tests passed (including npm package test and scripts)`);
       } catch (error) {
         result.error = error instanceof Error ? error.message : 'Unknown error';
-        console.log(`❌ ${variant.name} - Failed: ${result.error}`);
+        console.log(`❌ [${currentTest}/${totalVariants}] ${variant.name} - Failed: ${result.error}`);
+      } finally {
+        if (projectDir) {
+          this.cleanupTempDir(projectDir);
+        }
       }
 
       results.push(result);
@@ -559,8 +566,6 @@ console.log('✅ All tests passed! Package works correctly.');
   }
 
   cleanup(): void {
-    if (fs.existsSync(this.testDir)) {
-      fs.rmSync(this.testDir, { recursive: true, force: true });
-    }
+    this.tempDirs.forEach(dir => this.cleanupTempDir(dir));
   }
 }

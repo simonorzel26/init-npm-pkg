@@ -18,7 +18,8 @@
     "test:all": "bun run src/testing/runner.ts",
     "test:variants": "bun run src/testing/runner.ts",
     "test:quick": "bun run src/testing/runner.ts --test",
-    "test:cli": "bun run src/cli.ts"
+    "test:cli": "bun run src/cli.ts",
+    "check": "bun --help"
   },
   "dependencies": {
     "prompts": "latest"

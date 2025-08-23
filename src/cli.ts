@@ -144,8 +144,8 @@ function writeConfigFiles(projectDir: string, config: any): void {
 function generateTsConfig(config: any): string {
   const baseConfig = JSON.parse(sourceTemplates.tsconfig);
 
-  // Add Bun types if using Bun package manager or Bun test
-  if (config.packageManagerAndBuilder.name === 'bun' || config.tester.name === 'buntest') {
+  // Add Bun types only if using Bun package manager (which includes bun-types dependency)
+  if (config.packageManagerAndBuilder.name === 'bun') {
     if (!baseConfig.compilerOptions.types) {
       baseConfig.compilerOptions.types = [];
     }

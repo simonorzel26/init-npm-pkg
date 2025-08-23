@@ -76,7 +76,7 @@ jobs:
           bunx changeset version
           git add .
           git commit -m "chore: version packages"
-          git push
+          git push origin main --force
 
       - name: Publish to npm
         if: steps.check.outputs.has-changesets == 'true'

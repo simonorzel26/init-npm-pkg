@@ -1,11 +1,11 @@
-# create-pkg
+# create-npm-package
 
 Instantly create a fully configured npm package with GitHub Actions, testing, and modern tooling. Follows Matt Pocock's latest best practices for npm packages.
 
 ## Usage
 
 ```bash
-npx create-pkg
+npx create-npm-package
 ```
 
 ## CLI Output

@@ -1,6 +1,6 @@
 {
   "name": "create-npm-package",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A modern TypeScript package generator with multiple build tools, linters, and test frameworks",
   "keywords": [
     "typescript",

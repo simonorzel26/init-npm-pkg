@@ -5,9 +5,16 @@ async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const isTestMode = args.includes('--test') || args.includes('-t');
 
-  console.log('🧪 Starting comprehensive test suite...\n');
+  // Parse concurrency from command line arguments
+  const concurrencyArg = args.find(arg => arg.startsWith('--concurrency=') || arg.startsWith('-c='));
+  const concurrency = concurrencyArg
+    ? parseInt(concurrencyArg.split('=')[1], 10)
+    : 3; // Default to 3 concurrent tests
 
-  const testGenerator = new TestGenerator();
+  console.log('🧪 Starting comprehensive test suite...\n');
+  console.log(`⚡ Concurrency: ${concurrency} (use --concurrency=N to change)\n`);
+
+  const testGenerator = new TestGenerator(concurrency);
 
   try {
     const variants = isTestMode

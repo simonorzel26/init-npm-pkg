@@ -481,13 +481,15 @@ export class TestGenerator {
   private scriptExecutor: ScriptExecutor;
   private packageValidator: PackageValidator;
   private reportGenerator: ReportGenerator;
+  private concurrency: number;
 
-  constructor() {
+  constructor(concurrency: number = 1) {
     this.tempManager = new TempFileManager();
     this.projectBuilder = new ProjectBuilder(this.tempManager);
     this.scriptExecutor = new ScriptExecutor();
     this.packageValidator = new PackageValidator();
     this.reportGenerator = new ReportGenerator();
+    this.concurrency = concurrency;
   }
 
   generateAllVariants(): TestVariant[] {
@@ -555,10 +557,19 @@ export class TestGenerator {
   }
 
   async runAllTests(): Promise<TestResult[]> {
+    const totalVariants = this.variants.length;
+    console.log(`Testing ${totalVariants} variants with concurrency: ${this.concurrency}...`);
+
+    if (this.concurrency === 1) {
+      return this.runSequential();
+    } else {
+      return this.runParallel();
+    }
+  }
+
+  private async runSequential(): Promise<TestResult[]> {
     const results: TestResult[] = [];
     const totalVariants = this.variants.length;
-
-    console.log(`Testing ${totalVariants} variants...`);
 
     for (let i = 0; i < this.variants.length; i++) {
       const variant = this.variants[i];
@@ -568,6 +579,25 @@ export class TestGenerator {
 
       const result = await this.testVariant(variant, currentTest, totalVariants);
       results.push(result);
+    }
+
+    return results;
+  }
+
+  private async runParallel(): Promise<TestResult[]> {
+    const results: TestResult[] = [];
+    const totalVariants = this.variants.length;
+
+    for (let i = 0; i < this.variants.length; i += this.concurrency) {
+      const batch = this.variants.slice(i, i + this.concurrency);
+      const batchPromises = batch.map((variant, j) => {
+        const currentTest = i + j + 1;
+        console.log(`\n[${currentTest}/${totalVariants}] Testing ${variant.name}...`);
+        return this.testVariant(variant, currentTest, totalVariants);
+      });
+
+      const batchResults = await Promise.all(batchPromises);
+      results.push(...batchResults);
     }
 
     return results;

@@ -8,27 +8,13 @@ Instantly create a fully configured npm package with GitHub Actions, testing, an
 npx create-pkg
 ```
 
-## Output
+## CLI Output
 
-```
-✔ Project name: … my-awesome-lib
-✔ Package Manager & Builder: › Bun (package manager + builder)
-✔ Linter & Formatter: › Biome (linter + formatter)
-✔ Testing Framework: › Bun Test
-✔ Initialize git repository and create initial commit? … yes
+![CLI Setup](input.png)
 
-Created my-awesome-lib with:
-  Package Manager & Builder: Bun (package manager + builder)
-  Linter & Formatter: Biome (linter + formatter)
-  Testing: Bun Test
-  Versioning: Changesets
+## Generated Structure
 
-Next steps:
-  cd my-awesome-lib
-  bun install
-  bun run build
-  bun run test
-```
+![Project Structure](output.png)
 
 ## What You Get
 

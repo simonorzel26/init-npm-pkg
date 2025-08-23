@@ -1,5 +1,5 @@
 ---
-"create-pkg": patch
+"create-npm-package": patch
 ---
 
 init

@@ -9,7 +9,6 @@ export interface PackageManagerAndBuilder {
   runPrefix: string;
   devDependencies: Record<string, string>;
   scripts: Record<string, string>;
-  buildConfig?: string;
 }
 
 export interface LinterFormatter {

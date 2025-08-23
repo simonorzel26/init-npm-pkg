@@ -121,9 +121,9 @@ export class TestGenerator {
       });
     }
 
-    if (config.packageManagerAndBuilder.buildConfig) {
-      fs.writeFileSync(path.join(projectDir, "tsup.config.ts"), config.packageManagerAndBuilder.buildConfig);
-    }
+      if (config.packageManagerAndBuilder.name === 'npm') {
+    fs.writeFileSync(path.join(projectDir, "tsup.config.ts"), sourceTemplates.tsupConfig);
+  }
 
     if (config.versioning.name === 'changeset') {
       const changesetConfigPath = path.join(projectDir, '.changeset/config.json');

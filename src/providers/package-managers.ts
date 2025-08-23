@@ -46,15 +46,6 @@ export class PackageManagerProvider implements Provider<PackageManagerAndBuilder
         clean: 'rm -rf dist',
         typecheck: 'tsc --noEmit',
       },
-      buildConfig: `import { defineConfig } from 'tsup';
-
-export default defineConfig({
-  entry: ['src/index.ts'],
-  format: ['esm'],
-  dts: true,
-  sourcemap: true,
-  clean: true,
-});`,
     },
   };
 

@@ -501,6 +501,11 @@ export class TestGenerator {
     for (const pmb of packageManagerAndBuilders) {
       for (const lf of linterFormatters) {
         for (const tester of testers) {
+          // Skip invalid combinations: npm + buntest (buntest requires bun runtime)
+          if (pmb === 'npm' && tester === 'buntest') {
+            continue;
+          }
+
           for (const ver of versioning) {
             this.variants.push({
               packageManagerAndBuilder: pmb,
@@ -528,6 +533,11 @@ export class TestGenerator {
     for (const pmb of packageManagerAndBuilders) {
       for (const lf of linterFormatters) {
         for (const tester of testers) {
+          // Skip invalid combinations: npm + buntest (buntest requires bun runtime)
+          if (pmb === 'npm' && tester === 'buntest') {
+            continue;
+          }
+
           for (const ver of versioning) {
             this.variants.push({
               packageManagerAndBuilder: pmb,

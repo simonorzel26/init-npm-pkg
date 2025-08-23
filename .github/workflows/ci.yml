@@ -60,15 +60,26 @@ jobs:
         run: bun run build
 
       - name: Check for Changesets
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          setupGitUser: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -d ".changeset" ] && [ "$(ls -A .changeset)" ]; then
+            echo "has-changesets=true" >> $GITHUB_OUTPUT
+          else
+            echo "has-changesets=false" >> $GITHUB_OUTPUT
+          fi
+        id: check
+
+      - name: Version Packages
+        if: steps.check.outputs.has-changesets == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          bunx changeset version
+          git add .
+          git commit -m "chore: version packages"
+          git push
 
       - name: Publish to npm
-        if: steps.changesets.outputs.publishedPackages == 'create-pkg'
+        if: steps.check.outputs.has-changesets == 'true'
         run: bunx changeset publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

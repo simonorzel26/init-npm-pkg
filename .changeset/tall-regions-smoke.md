@@ -1,5 +1,5 @@
 ---
-"create-package": major
+"create-pkg": major
 ---
 
 Init changelog

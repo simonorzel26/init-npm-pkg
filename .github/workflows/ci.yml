@@ -59,14 +59,17 @@ jobs:
       - name: Build package
         run: bun run build
 
-      - name: Version and Publish
+      - name: Check for Changesets
         id: changesets
         uses: changesets/action@v1
         with:
-          publish: bunx changeset publish
           setupGitUser: true
-          createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to npm
+        if: steps.changesets.outputs.publishedPackages == 'create-pkg'
+        run: bunx changeset publish
+        env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 

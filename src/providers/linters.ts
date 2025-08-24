@@ -15,7 +15,7 @@ export class LinterProvider implements Provider<LinterFormatter> {
       },
       configFiles: {
         'biome.json': `{
-  "$schema": "https://biomejs.dev/schemas/2.2.0/schema.json",
+        "$schema": "https://biomejs.dev/schemas/latest/schema.json",
   "linter": { "enabled": true },
   "formatter": { "enabled": true },
   "files": {

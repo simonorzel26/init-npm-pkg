@@ -165,10 +165,17 @@ export class ProjectGenerator {
 
     if (userConfig.createGitRepo) {
       const githubUsername = GitHubService.detectUsername() || "yourusername";
-      console.log(`\nTo push to GitHub:`);
-      console.log(`  GitHub Username: ${githubUsername}`);
-      console.log(`  git remote add origin ${GitHubService.getRemoteUrl(githubUsername, userConfig.projectName)}`);
-      console.log(`  git push -u origin main`);
+      console.log(`\n📦 To publish to GitHub:`);
+      console.log(`  1. Create a new repository on GitHub:`);
+      console.log(`     • Go to https://github.com/new`);
+      console.log(`     • Repository name: ${userConfig.projectName}`);
+      console.log(`     • Choose public or private`);
+      console.log(`     • Don't initialize with README (we already have one)`);
+      console.log(`  2. Connect and push your local repository:`);
+      console.log(`     git remote add origin ${GitHubService.getRemoteUrl(githubUsername, userConfig.projectName)}`);
+      console.log(`     git push -u origin main`);
+      console.log(`\n💡 Tip: You can also use GitHub CLI if you have it installed:`);
+      console.log(`     gh repo create ${userConfig.projectName} --public --source=. --remote=origin --push`);
     }
   }
 }

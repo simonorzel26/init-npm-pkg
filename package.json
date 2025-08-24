@@ -1,6 +1,6 @@
 {
   "name": "init-npm-pkg",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "A modern TypeScript package generator with multiple build tools, linters, and test frameworks",
   "keywords": [
     "typescript",

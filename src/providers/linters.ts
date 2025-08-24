@@ -9,7 +9,7 @@ export class LinterProvider implements Provider<LinterFormatter> {
         '@biomejs/biome': 'latest',
       },
       scripts: {
-        lint: 'biome check .',
+        lint: 'biome check . --fix',
         format: 'biome format --write .',
         'lint:fix': 'biome check --write .',
       },

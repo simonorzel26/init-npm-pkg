@@ -23,6 +23,9 @@
     "url": "https://github.com/simonorzel26/init-npm-pkg/issues"
   },
   "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "main": "dist/cli.js",
   "bin": {

@@ -1,6 +1,6 @@
 {
-  "name": "@create/npm-pkg",
-  "version": "1.0.1",
+  "name": "init-npm-pkg",
+  "version": "1.1.0",
   "description": "A modern TypeScript package generator with multiple build tools, linters, and test frameworks",
   "keywords": [
     "typescript",
@@ -16,17 +16,17 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/simonorzel26/npm-pkg.git"
+    "url": "git+https://github.com/simonorzel26/init-npm-pkg.git"
   },
-  "homepage": "https://github.com/simonorzel26/npm-pkg#readme",
+  "homepage": "https://github.com/simonorzel26/init-npm-pkg#readme",
   "bugs": {
-    "url": "https://github.com/simonorzel26/npm-pkg/issues"
+    "url": "https://github.com/simonorzel26/init-npm-pkg/issues"
   },
   "private": false,
   "type": "module",
   "main": "dist/cli.js",
   "bin": {
-    "create-npm-pkg": "dist/cli.js"
+    "init-npm-pkg": "dist/cli.js"
   },
   "exports": {
     ".": {

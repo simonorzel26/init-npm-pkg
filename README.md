@@ -26,6 +26,17 @@ npx init-npm-pkg
 - **TypeScript** - Full type safety
 - **Git setup** - Optional repository initialization
 
+## Example Package
+
+This tool was used to create **[antiemdash](https://github.com/simonorzel26/antiemdash)** - a TypeScript utility to remove or replace em dashes in strings, with built-in support for wrapping Vercel AI SDK functions.
+
+The package demonstrates the full setup including:
+- TypeScript configuration
+- GitHub Actions for CI/CD
+- Comprehensive testing with Vitest
+- Modern linting with Biome
+- Semantic versioning with Changesets
+
 ## Options
 
 | Setting | Options |

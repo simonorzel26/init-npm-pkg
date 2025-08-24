@@ -38,9 +38,18 @@ export class GitHubService {
     try {
       console.log(`\n🔧 Initializing git repository...`);
       execSync('git init', { cwd: projectDir, stdio: 'pipe' });
+
+      // Set the default branch to 'main' (works with git 2.28+)
+      try {
+        execSync('git branch -M main', { cwd: projectDir, stdio: 'pipe' });
+      } catch {
+        // Fallback for older git versions - create and switch to main branch
+        execSync('git checkout -b main', { cwd: projectDir, stdio: 'pipe' });
+      }
+
       execSync('git add .', { cwd: projectDir, stdio: 'pipe' });
       execSync('git commit -m "Initial commit: Generated with create-package"', { cwd: projectDir, stdio: 'pipe' });
-      console.log(`✅ Git repository initialized with initial commit`);
+      console.log(`✅ Git repository initialized with initial commit on main branch`);
       return true;
     } catch (error) {
       console.log(`⚠️  Failed to initialize git repository: ${error}`);

@@ -24,12 +24,28 @@ export class ProjectGenerator {
       'release-it'
     );
 
-    fs.mkdirSync(targetProjectDirectory, { recursive: true });
+    try {
+      fs.mkdirSync(targetProjectDirectory, { recursive: true });
 
-    this.writeProjectFiles(targetProjectDirectory, projectConfig, config);
-    this.initializeGitRepo(targetProjectDirectory, config);
-    this.runInstall(targetProjectDirectory, config);
-    this.displayNextSteps(projectConfig, config);
+      this.writeProjectFiles(targetProjectDirectory, projectConfig, config);
+      this.initializeGitRepo(targetProjectDirectory, config);
+      this.runInstall(targetProjectDirectory, config);
+      this.displayNextSteps(projectConfig, config);
+    } catch (error) {
+      // Clean up the created directory if any error occurs
+      console.error('\n❌ Error occurred during project creation:', error);
+      console.log(`🧹 Cleaning up ${config.projectName} directory...`);
+
+      try {
+        fs.rmSync(targetProjectDirectory, { recursive: true, force: true });
+        console.log('✅ Cleanup completed');
+      } catch (cleanupError) {
+        console.error('⚠️  Failed to cleanup directory:', cleanupError);
+        console.log(`   You may need to manually remove the ${config.projectName} directory`);
+      }
+
+      process.exit(1);
+    }
   }
 
   private static writeProjectFiles(projectDir: string, projectConfig: any, userConfig: ProjectConfig): void {
@@ -134,16 +150,26 @@ export class ProjectGenerator {
     }
   }
 
-  private static runInstall(projectDir: string, userConfig: ProjectConfig): void {
+    private static runInstall(projectDir: string, userConfig: ProjectConfig): void {
     if (userConfig.runInstall) {
       const installCmd = userConfig.packageManagerAndBuilder === 'bun' ? 'bun install' : 'npm install';
 
       console.log(`\nRunning ${installCmd}...`);
       try {
-        execSync(installCmd, { cwd: projectDir, stdio: 'inherit' });
+        // Add timeout and better error handling
+        const result = execSync(installCmd, {
+          cwd: projectDir,
+          stdio: 'inherit',
+          timeout: 60000 // 60 second timeout
+        });
         console.log('✅ Dependencies installed successfully!');
-      } catch (error) {
-        console.error('❌ Failed to install dependencies:', error);
+      } catch (error: any) {
+        if (error.signal === 'SIGTERM') {
+          console.log('⚠️  Install timed out, but dependencies may have been installed successfully.');
+          console.log('   You can verify by running the install command manually.');
+        } else {
+          console.error('❌ Failed to install dependencies:', error.message);
+        }
       }
     }
   }

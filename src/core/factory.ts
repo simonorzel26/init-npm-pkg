@@ -9,7 +9,7 @@ export class ProjectFactory {
     packageManagerAndBuilderName: string,
     linterFormatterName: string,
     testerName: string = 'vitest',
-    versioningName: string = 'changeset'
+    versioningName: string = 'release-it'
   ): ProjectConfig {
     const packageManagerAndBuilder = packageManagerProvider.get(packageManagerAndBuilderName);
     const linterFormatter = linterProvider.get(linterFormatterName);
@@ -28,7 +28,7 @@ export class ProjectFactory {
     packageManagerAndBuilderName: string,
     linterFormatterName: string,
     testerName: string = 'vitest',
-    versioningName: string = 'changeset'
+    versioningName: string = 'release-it'
   ): void {
     packageManagerProvider.get(packageManagerAndBuilderName);
     linterProvider.get(linterFormatterName);

@@ -8,8 +8,8 @@ export interface ProjectConfig {
   packageManagerAndBuilder: string;
   linterFormatter: string;
   tester: string;
-  versioning: string;
   createGitRepo: boolean;
+  runInstall: boolean;
 }
 
 export class PromptsService {
@@ -22,16 +22,16 @@ export class PromptsService {
     const packageManagerAndBuilder = await this.getPackageManagerAndBuilder(envPackageManager);
     const linterFormatter = await this.getLinterFormatter(envLinterFormatter);
     const tester = await this.getTester();
-    const versioning = 'changeset'; // Fixed for now
     const createGitRepo = await this.getGitRepoCreation();
+    const runInstall = await this.getRunInstall();
 
     return {
       projectName,
       packageManagerAndBuilder,
       linterFormatter,
       tester,
-      versioning,
       createGitRepo,
+      runInstall,
     };
   }
 
@@ -120,5 +120,17 @@ export class PromptsService {
 
     const answer = await prompts(gitRepoQuestion);
     return answer.createGitRepo;
+  }
+
+  private static async getRunInstall(): Promise<boolean> {
+    const runInstallQuestion: PromptObject<'runInstall'> = {
+      type: "confirm",
+      name: "runInstall",
+      message: "Run package manager install after creation?",
+      initial: true,
+    };
+
+    const answer = await prompts(runInstallQuestion);
+    return answer.runInstall;
   }
 }

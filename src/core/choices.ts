@@ -1,13 +1,11 @@
 import { packageManagerProvider } from '../providers/package-managers.js';
 import { linterProvider } from '../providers/linters.js';
 import { testerProvider } from '../providers/testers.js';
-import { versioningProvider } from '../providers/versioning.js';
 
 export const choices = {
   packageManagerAndBuilders: packageManagerProvider.getAll(),
   linterFormatters: linterProvider.getAll(),
   testers: testerProvider.getAll(),
-  versioning: versioningProvider.getAll(),
 } as const;
 
 export const defaultChoices = {
@@ -20,7 +18,6 @@ export const availableChoices = {
   packageManagerAndBuilders: Object.keys(choices.packageManagerAndBuilders),
   linterFormatters: Object.keys(choices.linterFormatters),
   testers: Object.keys(choices.testers),
-  versioning: Object.keys(choices.versioning),
 } as const;
 
 export function getChoiceDescriptions() {
@@ -34,10 +31,6 @@ export function getChoiceDescriptions() {
       value: key,
     })),
     testers: Object.entries(choices.testers).map(([key, value]) => ({
-      title: value.title,
-      value: key,
-    })),
-    versioning: Object.entries(choices.versioning).map(([key, value]) => ({
       title: value.title,
       value: key,
     })),

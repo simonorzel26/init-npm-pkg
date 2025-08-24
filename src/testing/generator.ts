@@ -127,10 +127,9 @@ class ProjectBuilder {
   }
 
   private writeVersioningConfigs(projectDir: string, config: any): void {
-    if (config.versioning.name === 'changeset') {
-      const changesetConfigPath = path.join(projectDir, '.changeset/config.json');
-      fs.mkdirSync(path.dirname(changesetConfigPath), { recursive: true });
-      fs.writeFileSync(changesetConfigPath, config.versioning.config);
+    if (config.versioning.name === 'release-it') {
+      const releaseItConfigPath = path.join(projectDir, '.release-it.json');
+      fs.writeFileSync(releaseItConfigPath, config.versioning.config);
     }
   }
 
@@ -528,7 +527,7 @@ export class TestGenerator {
     const packageManagerAndBuilders = ['bun', 'npm'];
     const linterFormatters = ['biome', 'eslint'];
     const testers = ['vitest', 'buntest', 'none'];
-    const versioning = ['changeset'];
+          const versioning = ['release-it'];
 
     this.variants = [];
 

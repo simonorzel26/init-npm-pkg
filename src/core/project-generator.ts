@@ -1,5 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { execSync } from "node:child_process";
 import { ProjectFactory } from "./factory.js";
 import { sourceTemplates } from "../templates/source.js";
 import { generateCI } from "../templates/ci.js";
@@ -20,13 +21,14 @@ export class ProjectGenerator {
       config.packageManagerAndBuilder,
       config.linterFormatter,
       config.tester,
-      config.versioning
+      'release-it'
     );
 
     fs.mkdirSync(targetProjectDirectory, { recursive: true });
 
     this.writeProjectFiles(targetProjectDirectory, projectConfig, config);
     this.initializeGitRepo(targetProjectDirectory, config);
+    this.runInstall(targetProjectDirectory, config);
     this.displayNextSteps(projectConfig, config);
   }
 
@@ -63,10 +65,9 @@ export class ProjectGenerator {
     }
 
     // Write versioning configs
-    if (projectConfig.versioning.name === 'changeset') {
-      const changesetConfigPath = path.join(projectDir, '.changeset/config.json');
-      fs.mkdirSync(path.dirname(changesetConfigPath), { recursive: true });
-      fs.writeFileSync(changesetConfigPath, projectConfig.versioning.config);
+    if (projectConfig.versioning.name === 'release-it') {
+      const releaseItConfigPath = path.join(projectDir, '.release-it.json');
+      fs.writeFileSync(releaseItConfigPath, projectConfig.versioning.config);
     }
 
     // Write TypeScript config
@@ -133,6 +134,20 @@ export class ProjectGenerator {
     }
   }
 
+  private static runInstall(projectDir: string, userConfig: ProjectConfig): void {
+    if (userConfig.runInstall) {
+      const installCmd = userConfig.packageManagerAndBuilder === 'bun' ? 'bun install' : 'npm install';
+
+      console.log(`\nRunning ${installCmd}...`);
+      try {
+        execSync(installCmd, { cwd: projectDir, stdio: 'inherit' });
+        console.log('✅ Dependencies installed successfully!');
+      } catch (error) {
+        console.error('❌ Failed to install dependencies:', error);
+      }
+    }
+  }
+
   private static displayNextSteps(projectConfig: any, userConfig: ProjectConfig): void {
     console.log(`\nCreated ${userConfig.projectName} with:`);
     console.log(`  Package Manager & Builder: ${projectConfig.packageManagerAndBuilder.title}`);
@@ -142,7 +157,9 @@ export class ProjectGenerator {
 
     console.log("\nNext steps:");
     console.log(`  cd ${userConfig.projectName}`);
-    console.log(`  ${projectConfig.packageManagerAndBuilder.installCmd}`);
+    if (!userConfig.runInstall) {
+      console.log(`  ${projectConfig.packageManagerAndBuilder.installCmd}`);
+    }
     console.log(`  ${projectConfig.packageManagerAndBuilder.runPrefix} build`);
     console.log(`  ${projectConfig.packageManagerAndBuilder.runPrefix} test`);
 

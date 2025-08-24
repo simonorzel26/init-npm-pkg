@@ -26,13 +26,13 @@ async function main(): Promise<void> {
       console.log(`  Package Managers & Builders: 2 (npm, bun)`);
       console.log(`  Linter & Formatters: 2 (prettier, biome)`);
       console.log(`  Testers: 2 (vitest, bun)`);
-      console.log(`  Versioning: 1 (changeset)`);
+      console.log(`  Versioning: 1 (release-it)`);
       console.log(`  Total combinations: 2 × 2 × 2 × 1 = ${variants.length} (test mode)`);
     } else {
       console.log(`  Package Managers & Builders: 2 (bun, npm)`);
       console.log(`  Linter & Formatters: 4 (biome, ultracite, eslint, prettier)`);
       console.log(`  Testers: 2 (vitest, bun)`);
-      console.log(`  Versioning: 1 (changeset)`);
+      console.log(`  Versioning: 1 (release-it)`);
       console.log(`  Total combinations: 2 × 4 × 2 × 1 = ${variants.length}`);
     }
     console.log('');

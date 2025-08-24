@@ -2,28 +2,32 @@ import type { Versioning, Provider } from '../core/types.js';
 
 export class VersioningProvider implements Provider<Versioning> {
   private providers: Record<string, Versioning> = {
-    changeset: {
-      name: 'changeset',
-      title: 'Changesets',
+    'release-it': {
+      name: 'release-it',
+      title: 'Release It',
       devDependencies: {
-        '@changesets/cli': 'latest',
+        'release-it': 'latest',
       },
       scripts: {
-        changeset: 'changeset',
-        version: 'changeset version',
-        release: 'changeset publish',
-        'local-release': 'changeset version && changeset publish',
+        release: 'release-it',
       },
       config: `{
-  "$schema": "https://unpkg.com/@changesets/config@2.3.1/schema.json",
-  "changelog": "@changesets/cli/changelog",
-  "commit": false,
-  "fixed": [],
-  "linked": [],
-  "access": "restricted",
-  "baseBranch": "main",
-  "updateInternalDependencies": "patch",
-  "ignore": []
+  "$schema": "https://unpkg.com/release-it@19/schema/release-it.json",
+  "git": {
+    "commitMessage": "chore: release v\${version}",
+    "tagName": "v\${version}",
+    "push": true
+  },
+  "github": {
+    "release": true
+  },
+  "npm": {
+    "publish": true
+  },
+  "hooks": {
+    "before:init": ["bun run build"],
+    "after:bump": "echo Version bumped to \${version}"
+  }
 }`,
     },
   };

@@ -48,7 +48,7 @@ export class GitHubService {
       }
 
       execSync('git add .', { cwd: projectDir, stdio: 'pipe' });
-      execSync('git commit -m "Initial commit: Generated with create-package"', { cwd: projectDir, stdio: 'pipe' });
+      execSync('git commit -m "Initial commit: Generated with init-npm-package"', { cwd: projectDir, stdio: 'pipe' });
       console.log(`✅ Git repository initialized with initial commit on main branch`);
       return true;
     } catch (error) {

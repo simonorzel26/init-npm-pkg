@@ -109,7 +109,7 @@ coverage/
 
   readme: (projectName: string) => `# ${projectName}
 
-A TypeScript library scaffolded by create-package.
+A TypeScript library scaffolded by init-npm-package.
 
 ## Installation
 

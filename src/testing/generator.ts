@@ -44,7 +44,7 @@ class ProjectBuilder {
   }
 
   async createTestProject(variant: TestVariant): Promise<{ success: boolean; projectDir?: string }> {
-    const tempDir = this.tempManager.createTempDir(`create-package-test-${variant.name}-`);
+    const tempDir = this.tempManager.createTempDir(`init-npm-package-test-${variant.name}-`);
 
     try {
       const config = ProjectFactory.createProject(
@@ -403,7 +403,7 @@ class PackageValidator {
 
   async testPackageAsNpmPackage(variant: TestVariant, projectDir: string, tempManager: TempFileManager): Promise<boolean> {
     try {
-      const consumerDir = tempManager.createTempDir(`create-package-consumer-${variant.name}-`);
+      const consumerDir = tempManager.createTempDir(`init-npm-package-consumer-${variant.name}-`);
 
       const testScript = `import { add, subtract, multiply, divide } from '${projectDir}/dist/index.js';
 
@@ -495,7 +495,7 @@ export class TestGenerator {
     const packageManagerAndBuilders = Object.keys(choices.packageManagerAndBuilders);
     const linterFormatters = Object.keys(choices.linterFormatters);
     const testers = Object.keys(choices.testers);
-    const versioning = Object.keys(choices.versioning);
+    const versioning = ['release-it'];
 
     this.variants = [];
 

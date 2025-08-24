@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "create-package",
+      "name": "init-npm-package",
       "dependencies": {
         "prompts": "latest",
       },

@@ -24,7 +24,8 @@
   },
   "private": false,
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "type": "module",
   "main": "dist/cli.js",
@@ -50,15 +51,16 @@
     "test:variants": "bun run src/testing/runner.ts",
     "test:quick": "bun run src/testing/runner.ts --test",
     "test:cli": "bun run src/cli.ts",
-    "prepublishOnly": "bun run build"
+    "prepublishOnly": "bun run build",
+    "release": "release-it"
   },
   "dependencies": {
     "prompts": "latest"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.29.6",
     "@types/node": "latest",
     "@types/prompts": "latest",
+    "release-it": "^19.0.4",
     "typescript": "latest",
     "vitest": "latest"
   }

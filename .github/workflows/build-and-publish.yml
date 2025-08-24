@@ -1,4 +1,4 @@
-name: Build and Publish
+name: Test
 
 on:
   push:
@@ -27,64 +27,3 @@ jobs:
 
       - name: Generate and test all variants
         run: bun run test:variants
-
-  release:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    permissions:
-      contents: write
-      pull-requests: write
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Configure npm
-        run: |
-          npm config set registry https://registry.npmjs.org/
-          npm config set access public
-
-      - name: Install dependencies
-        run: bun install
-
-      - name: Build package
-        run: bun run build
-
-      - name: Check for Changesets
-        run: |
-          if [ -d ".changeset" ] && [ "$(ls -A .changeset)" ]; then
-            echo "has-changesets=true" >> $GITHUB_OUTPUT
-          else
-            echo "has-changesets=false" >> $GITHUB_OUTPUT
-          fi
-        id: check
-
-      - name: Version Packages
-        if: steps.check.outputs.has-changesets == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          bunx changeset version
-          git add .
-          git commit -m "chore: version packages"
-          git push origin main --force
-
-      - name: Publish to npm
-        if: steps.check.outputs.has-changesets == 'true'
-        run: bunx changeset publish
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
